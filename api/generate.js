@@ -13,35 +13,33 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Server configuration error: Missing API Key' });
     }
 
-    // User requested gemini-2.5-flash as the primary working model
-    const MODELS_TO_TRY = [
-        "gemini-2.5-flash",
-        "gemini-2.0-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-latest",
-        "gemini-1.5-pro"
-    ];
+    const MODELS_TO_TRY = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
 
-    const promptText = `Generate a simulated supply chain anomaly prediction report for the sector/shipment "${target}".
-    Return ONLY a JSON object with this exact structure:
+    const promptText = `Act as a Global Logistics AI Command Center. Analyze the sector: "${target}".
+    Provide a hyper-detailed JSON report for an "Anomaly Predictor" dashboard.
+    The response must be a single JSON object with:
     {
-        "summary": "High-level summary of global logistics risks for this sector",
-        "anomalies": [
-            {
-                "type": "Port Congestion/Weather/Cyber Attack/Fuel Spike",
-                "severity": "Critical/High/Medium/Low",
-                "description": "description of the specific bottleneck",
-                "date": "2026-02-20"
-            },
-            { "type": "...", "severity": "...", "description": "...", "date": "..." },
-            { "type": "...", "severity": "...", "description": "...", "date": "..." },
-            { "type": "...", "severity": "...", "description": "...", "date": "..." },
-            { "type": "...", "severity": "...", "description": "...", "date": "..." }
+        "status_summary": "One sentence situational overview",
+        "global_news": [
+            {"event": "Breaking news headline", "impact": "0-100", "source": "Reuters/AI Logistics"}
         ],
-        "visual_prompt": "Description of a futuristic cargo ship or automated warehouse in a storm, cyberpunk/digital twin style, high detail"
-    }`;
-
-    let lastError = null;
+        "active_shipments": [
+            {
+                "id": "SH-XXXX",
+                "origin": {"city": "Name", "x": 0-800, "y": 0-400},
+                "destination": {"city": "Name", "x": 0-800, "y": 0-400},
+                "status": "Delayed/In Transit/Rerouted",
+                "risk_factor": "High/Critical/Stable",
+                "original_eta": "YYYY-MM-DD",
+                "predicted_anomaly": "Description of potential failure",
+                "reroute_recommendation": "Description of the new path",
+                "savings": "Estimated % efficiency gain"
+            }
+        ],
+        "system_visual": "Cyberpunk terminal style prompt for a futuristic shipyard map"
+    }
+    Use realistic x/y coordinates for a map area of 800x400. Generate 5 news items and 4 shipments.
+    Return ONLY JSON.`;
 
     for (const model of MODELS_TO_TRY) {
         try {
@@ -49,36 +47,15 @@ export default async function handler(req, res) {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptText }] }]
-                })
+                body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
             });
 
             const data = await response.json().catch(() => ({}));
+            if (!response.ok) continue;
 
-            if (!response.ok) {
-                // If model is not found or not supported, continue to next one
-                if (response.status === 404 || data.error?.message?.includes("not found")) {
-                    console.warn(`Model ${model} not found, trying next...`);
-                    continue;
-                }
-                throw new Error(data.error?.message || `Gemini API Error: ${response.status}`);
-            }
-
-            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-                throw new Error("AI returned an empty response.");
-            }
-
-            const rawText = data.candidates[0].content.parts[0].text;
-            const cleanText = rawText.replace(/```json|```/g, '').trim();
-
-            return res.status(200).json(JSON.parse(cleanText));
-
-        } catch (error) {
-            console.error(`Error with model ${model}:`, error.message);
-            lastError = error;
-        }
+            const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+            return res.status(200).json(JSON.parse(text));
+        } catch (e) { console.error(e); }
     }
-
-    res.status(500).json({ error: lastError?.message || 'All models failed.' });
+    res.status(500).json({ error: "Intelligence Feed Unavailable" });
 }
