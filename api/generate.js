@@ -13,48 +13,72 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Server configuration error: Missing API Key' });
     }
 
-    try {
-        const promptText = `Generate a simulated supply chain anomaly prediction report for the sector/shipment "${target}".
-        Return ONLY a JSON object with this exact structure:
-        {
-            "summary": "High-level summary of global logistics risks for this sector",
-            "anomalies": [
-                {
-                    "type": "Port Congestion/Weather/Cyber Attack/Fuel Spike",
-                    "severity": "Critical/High/Medium/Low",
-                    "description": "description of the specific bottleneck",
-                    "date": "2026-02-20"
-                },
-                { "type": "...", "severity": "...", "description": "...", "date": "..." },
-                { "type": "...", "severity": "...", "description": "...", "date": "..." },
-                { "type": "...", "severity": "...", "description": "...", "date": "..." },
-                { "type": "...", "severity": "...", "description": "...", "date": "..." }
-            ],
-            "visual_prompt": "Description of a futuristic cargo ship or automated warehouse in a storm, cyberpunk/digital twin style, high detail"
-        }`;
+    // User requested gemini-2.5-flash as the primary working model
+    const MODELS_TO_TRY = [
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-latest",
+        "gemini-1.5-pro"
+    ];
 
-        // Using 1.5-flash as per user rules for stability/free tier
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }]
-            })
-        });
+    const promptText = `Generate a simulated supply chain anomaly prediction report for the sector/shipment "${target}".
+    Return ONLY a JSON object with this exact structure:
+    {
+        "summary": "High-level summary of global logistics risks for this sector",
+        "anomalies": [
+            {
+                "type": "Port Congestion/Weather/Cyber Attack/Fuel Spike",
+                "severity": "Critical/High/Medium/Low",
+                "description": "description of the specific bottleneck",
+                "date": "2026-02-20"
+            },
+            { "type": "...", "severity": "...", "description": "...", "date": "..." },
+            { "type": "...", "severity": "...", "description": "...", "date": "..." },
+            { "type": "...", "severity": "...", "description": "...", "date": "..." },
+            { "type": "...", "severity": "...", "description": "...", "date": "..." }
+        ],
+        "visual_prompt": "Description of a futuristic cargo ship or automated warehouse in a storm, cyberpunk/digital twin style, high detail"
+    }`;
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || `Gemini API Error: ${response.status}`);
+    let lastError = null;
+
+    for (const model of MODELS_TO_TRY) {
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: promptText }] }]
+                })
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                // If model is not found or not supported, continue to next one
+                if (response.status === 404 || data.error?.message?.includes("not found")) {
+                    console.warn(`Model ${model} not found, trying next...`);
+                    continue;
+                }
+                throw new Error(data.error?.message || `Gemini API Error: ${response.status}`);
+            }
+
+            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+                throw new Error("AI returned an empty response.");
+            }
+
+            const rawText = data.candidates[0].content.parts[0].text;
+            const cleanText = rawText.replace(/```json|```/g, '').trim();
+
+            return res.status(200).json(JSON.parse(cleanText));
+
+        } catch (error) {
+            console.error(`Error with model ${model}:`, error.message);
+            lastError = error;
         }
-
-        const data = await response.json();
-        const rawText = data.candidates[0].content.parts[0].text;
-        const cleanText = rawText.replace(/```json|```/g, '').trim();
-
-        res.status(200).json(JSON.parse(cleanText));
-
-    } catch (error) {
-        console.error('Backend Error:', error);
-        res.status(500).json({ error: error.message });
     }
+
+    res.status(500).json({ error: lastError?.message || 'All models failed.' });
 }
