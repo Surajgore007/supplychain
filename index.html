@@ -4,65 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Logistics Command | Supply Chain Predictor</title>
+    <title>Guardian AI | Ethical Risk Monitor</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Syncopate:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg: #020205;
-            --panel: rgba(16, 16, 24, 0.8);
-            --accent: #00f2ff;
-            --danger: #ff0055;
-            --success: #00ffaa;
-            --text: #e0e6ed;
-            --glass: rgba(255, 255, 255, 0.05);
+            --bg: #050508;
+            --panel: rgba(10, 10, 15, 0.9);
+            --accent: #50ffaf;
+            --warning: #ffaa00;
+            --danger: #ff4545;
+            --text: #f0f0f5;
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
         body {
-            margin: 0;
-            padding: 0;
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
             overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 70%),
-                linear-gradient(rgba(18, 18, 20, 0.8) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(18, 18, 20, 0.8) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
+            background-image: radial-gradient(circle at 0% 0%, rgba(80, 255, 175, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(255, 69, 69, 0.03) 0%, transparent 50%);
         }
 
-        .dashboard {
+        .layout {
             display: grid;
-            grid-template-columns: 350px 1fr 300px;
-            grid-template-rows: 80px 1fr 100px;
+            grid-template-columns: 380px 1fr;
+            grid-template-rows: 90px 1fr;
             height: 100vh;
-            gap: 15px;
-            padding: 15px;
+            gap: 20px;
+            padding: 20px;
             box-sizing: border-box;
         }
 
-        /* Glassmorphism Panel */
         .panel {
             background: var(--panel);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass);
-            border-radius: 12px;
-            padding: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
             position: relative;
-            overflow: hidden;
-        }
-
-        .panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--accent);
-            box-shadow: 0 0 15px var(--accent);
         }
 
         header {
@@ -70,34 +53,31 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 25px;
         }
 
-        header h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.4rem;
-            letter-spacing: 3px;
+        h1 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
             margin: 0;
-            text-transform: uppercase;
             color: var(--accent);
-            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+            text-shadow: 0 0 20px rgba(80, 255, 175, 0.3);
         }
 
-        .search-area {
+        .input-area {
             display: flex;
-            gap: 10px;
-            background: var(--glass);
-            padding: 5px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 242, 255, 0.2);
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 12px;
         }
 
         input {
             background: transparent;
             border: none;
             color: white;
-            padding: 8px 15px;
-            width: 250px;
+            padding: 10px 15px;
+            width: 300px;
             outline: none;
             font-family: inherit;
         }
@@ -106,224 +86,190 @@
             background: var(--accent);
             color: black;
             border: none;
-            padding: 8px 20px;
-            border-radius: 4px;
-            font-weight: bold;
-            text-transform: uppercase;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
-        }
-
-        button:hover {
-            box-shadow: 0 0 20px var(--accent);
-            transform: translateY(-1px);
-        }
-
-        /* Sidebar - Shipment List */
-        .sidebar-left {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            overflow-y: auto;
-        }
-
-        .shipment-card {
-            background: var(--glass);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: 0.2s;
-            cursor: pointer;
-        }
-
-        .shipment-card:hover {
-            border-color: var(--accent);
-            background: rgba(0, 242, 255, 0.05);
-        }
-
-        .shipment-card .id {
-            color: var(--accent);
-            font-weight: bold;
+            text-transform: uppercase;
             font-size: 0.8rem;
         }
 
-        .shipment-card .route {
-            font-size: 0.9rem;
-            margin: 5px 0;
+        button:hover {
+            box-shadow: 0 0 30px var(--accent);
+            transform: translateY(-2px);
         }
 
-        .shipment-card .risk {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            padding: 2px 6px;
-            border-radius: 3px;
-            border: 1px solid currentColor;
+        /* Integrity Gauge */
+        .integrity-box {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
-        .risk.Critical {
-            color: var(--danger);
-        }
-
-        .risk.High {
-            color: #ffa500;
-        }
-
-        .risk.Stable {
-            color: var(--success);
-        }
-
-        /* Main Section - Map */
-        .main-stage {
-            position: relative;
+        .gauge-circle {
+            width: 150px;
+            height: 150px;
+            border: 8px solid var(--glass);
+            border-radius: 50%;
+            margin: 0 auto 15px;
             display: flex;
-            flex-direction: column;
-            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            border-top-color: var(--accent);
+            transition: 1s;
         }
 
-        #map-container {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(0, 242, 255, 0.1);
-        }
-
-        svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .path {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.1);
-            stroke-width: 1;
-        }
-
-        .shipment-line {
-            fill: none;
-            stroke: var(--accent);
-            stroke-width: 2;
-            stroke-dasharray: 10, 5;
-            animation: dash 30s linear infinite;
-        }
-
-        .reroute-line {
-            fill: none;
-            stroke: var(--success);
-            stroke-width: 2;
-            opacity: 0.6;
-        }
-
-        .node {
-            fill: var(--accent);
-            r: 4;
-        }
-
-        .node-dest {
-            fill: var(--danger);
-            r: 4;
-        }
-
-        @keyframes dash {
-            to {
-                stroke-dashoffset: -1000;
-            }
-        }
-
-        /* Right Sidebar - Intel Feed */
-        .sidebar-right {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .news-item {
-            font-size: 0.85rem;
-            padding: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .news-item span {
+        .gauge-value {
+            font-size: 2.5rem;
+            font-weight: 700;
             color: var(--accent);
+        }
+
+        /* Metrics Grid */
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: var(--glass);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-card label {
             display: block;
             font-size: 0.7rem;
             text-transform: uppercase;
+            color: #888;
+            margin-bottom: 5px;
         }
 
-        /* Footer - News Ticker */
-        footer {
-            grid-column: 1 / -1;
-            background: rgba(0, 0, 0, 0.8);
-            border-top: 1px solid var(--accent);
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            white-space: nowrap;
+        .metric-card span {
+            font-weight: 700;
+            color: var(--text);
         }
 
-        .ticker {
-            display: inline-block;
-            padding-left: 100%;
-            animation: ticker 60s linear infinite;
-            color: var(--accent);
-            font-size: 0.9rem;
+        /* Violation Log */
+        .violation-log {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .violation-card {
+            background: var(--glass);
+            border-left: 3px solid var(--danger);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+        }
+
+        .violation-type {
+            color: var(--danger);
+            font-weight: 700;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
-        @keyframes ticker {
-            0% {
-                transform: translate3d(0, 0, 0);
-            }
-
-            100% {
-                transform: translate3d(-100%, 0, 0);
-            }
+        .violation-desc {
+            font-size: 0.9rem;
+            margin: 8px 0;
+            color: #ccc;
         }
 
-        /* Overlay Loader */
-        .terminal-overlay {
+        .mitigation {
+            font-size: 0.8rem;
+            color: var(--accent);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        /* Main Viewport */
+        .main-stage {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #visual-anchor {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #visual-anchor img {
+            max-width: 100%;
+            border-radius: 12px;
+            opacity: 0.8;
+        }
+
+        .status-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        /* Loader */
+        #loader {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
-            z-index: 100;
-            display: none;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: 'Courier New', monospace;
+            font-family: 'Syncopate', sans-serif;
             color: var(--accent);
         }
 
-        .typing {
-            border-right: 2px solid var(--accent);
-            white-space: nowrap;
-            overflow: hidden;
-            animation: typing 2s steps(40, end), blink .75s step-end infinite;
+        .scanner {
+            width: 300px;
+            height: 2px;
+            background: var(--accent);
+            box-shadow: 0 0 20px var(--accent);
+            animation: scanning 1.5s infinite ease-in-out;
         }
 
-        @keyframes typing {
-            from {
-                width: 0
-            }
-
-            to {
-                width: 100%
-            }
-        }
-
-        @keyframes blink {
-
-            from,
-            to {
-                border-color: transparent
+        @keyframes scanning {
+            0% {
+                opacity: 0.2;
             }
 
             50% {
-                border-color: var(--accent)
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.2;
             }
         }
     </style>
@@ -331,73 +277,64 @@
 
 <body>
 
-    <div id="terminal" class="terminal-overlay">
-        <div class="typing">INITIALIZING GLOBAL INTELLIGENCE LINK...</div>
+    <div id="loader">
+        <div style="margin-bottom: 20px; letter-spacing: 5px;">SCANNING ETHICAL LAYER</div>
+        <div class="scanner"></div>
     </div>
 
-    <div class="dashboard">
+    <div class="layout">
         <header class="panel">
-            <h1>Supply Chain Anomaly Predictor</h1>
-            <div class="search-area">
-                <input type="text" id="target-input" placeholder="SECTOR: (e.g. Semiconductors)" value="Semiconductors">
-                <button id="predict-btn">SYNC INTEL</button>
+            <h1>REAL-TIME ETHICAL RISK MONITOR</h1>
+            <div class="input-area">
+                <input type="text" id="target-input" placeholder="SYSTEM ID (e.g. Recruitment AI Core)"
+                    value="Neural-Recruiter v2.4">
+                <button id="audit-btn">INITIATE AUDIT</button>
             </div>
-            <div id="summary-header" style="font-size: 0.9rem; color: #888;">Standby for network sync...</div>
         </header>
 
-        <section class="sidebar-left panel" id="shipment-list">
-            <h2 style="margin: 0 0 15px 0; font-size: 1rem; color: var(--accent);">ACTIVE MONITOR</h2>
-            <!-- Shipment Cards Load Here -->
-        </section>
-
-        <section class="main-stage">
-            <div id="map-container" class="panel">
-                <svg id="world-map" viewBox="0 0 800 400">
-                    <!-- Placeholder Map Grid -->
-                    <g opacity="0.1">
-                        <line x1="0" y1="100" x2="800" y2="100" stroke="white" />
-                        <line x1="0" y1="200" x2="800" y2="200" stroke="white" />
-                        <line x1="0" y1="300" x2="800" y2="300" stroke="white" />
-                        <line x1="200" y1="0" x2="200" y2="400" stroke="white" />
-                        <line x1="400" y1="0" x2="400" y2="400" stroke="white" />
-                        <line x1="600" y1="0" x2="600" y2="400" stroke="white" />
-                    </g>
-                    <g id="map-layers"></g>
-                </svg>
+        <aside class="panel" style="display: flex; flex-direction: column;">
+            <div class="integrity-box">
+                <div class="gauge-circle" id="main-gauge">
+                    <div class="gauge-value" id="integrity-value">--</div>
+                </div>
+                <div style="font-size: 0.8rem; color: #888; text-transform: uppercase;">Overall System Integrity</div>
             </div>
-            <div class="panel" style="flex: 0.3;">
-                <h2 style="margin: 0 0 10px 0; font-size: 1rem; color: var(--accent);">REROUTE ANALYTICS</h2>
-                <div id="reroute-details" style="font-size: 0.9rem; color: #aaa;">Select a flagged shipment for deep
-                    analysis.</div>
+
+            <div class="metrics">
+                <div class="metric-card"><label>Bias</label><span id="bias-val">--</span></div>
+                <div class="metric-card"><label>Fairness</label><span id="fairness-val">--</span></div>
+                <div class="metric-card"><label>Privacy</label><span id="privacy-val">--</span></div>
             </div>
-        </section>
 
-        <section class="sidebar-right panel" id="news-feed">
-            <h2 style="margin: 0 0 15px 0; font-size: 1rem; color: var(--accent);">INTEL FEED</h2>
-            <!-- News Items Load Here -->
-        </section>
+            <div class="violation-log" id="violation-log">
+                <div style="text-align: center; color: #555; margin-top: 50px;">Waiting for audit link...</div>
+            </div>
+        </aside>
 
-        <footer id="ticker-footer">
-            <div class="ticker" id="ticker-content">SYSTEM STANDBY // WAITING FOR SECTOR INPUT // INITIALIZING...</div>
-        </footer>
+        <main class="main-stage">
+            <div id="visual-anchor">
+                <div class="status-overlay" id="status-text">INITIAL STAGING</div>
+                <img id="audit-img" src="" style="display: none;">
+                <div style="color: #444; font-size: 1.2rem; font-weight: 300;">INTEGRITY MONITOR STANDBY</div>
+            </div>
+
+            <div class="panel" style="flex: 0.2;">
+                <div id="summary-text" style="color: #bbb; line-height: 1.6;">Enter enterprise AI system parameters to
+                    begin real-time ethical drift analysis.</div>
+            </div>
+        </main>
     </div>
 
     <script>
-        const btn = document.getElementById('predict-btn');
+        const btn = document.getElementById('audit-btn');
         const input = document.getElementById('target-input');
-        const terminal = document.getElementById('terminal');
-        const mapLayers = document.getElementById('map-layers');
-        const shipmentList = document.getElementById('shipment-list');
-        const newsFeed = document.getElementById('news-feed');
-        const summaryHeader = document.getElementById('summary-header');
-        const ticker = document.getElementById('ticker-content');
-        const rerouteAnalytics = document.getElementById('reroute-details');
+        const loader = document.getElementById('loader');
 
-        async function syncIntel() {
+        async function performAudit() {
             const target = input.value.trim();
             if (!target) return;
 
-            terminal.style.display = 'flex';
+            loader.style.display = 'flex';
 
             try {
                 const response = await fetch('/api/generate', {
@@ -406,88 +343,66 @@
                     body: JSON.stringify({ target })
                 });
 
-                if (!response.ok) throw new Error("Sync Failed");
+                if (!response.ok) throw new Error("Audit Link Severed");
                 const data = await response.json();
 
-                renderDashboard(data);
+                updateDashboard(data);
             } catch (err) {
                 alert(err.message);
             } finally {
-                setTimeout(() => { terminal.style.display = 'none'; }, 800);
+                loader.style.display = 'none';
             }
         }
 
-        function renderDashboard(data) {
-            // 1. Update Header & Ticker
-            summaryHeader.innerText = data.status_summary;
-            ticker.innerText = (data.global_news || []).map(n => `[!] ${n.event} (Impact: ${n.impact})`).join(" // ");
+        function updateDashboard(data) {
+            // Update Gauge
+            document.getElementById('integrity-value').innerText = data.overall_integrity + '%';
+            const gauge = document.getElementById('main-gauge');
+            const intensity = 100 - data.overall_integrity;
+            gauge.style.borderTopColor = data.overall_integrity > 70 ? '#50ffaf' : (data.overall_integrity > 40 ? '#ffaa00' : '#ff4545');
+            gauge.style.boxShadow = `0 0 40px ${gauge.style.borderTopColor}22`;
 
-            // 2. Update News Feed
-            newsFeed.innerHTML = '<h2 style="margin: 0 0 15px 0; font-size: 1rem; color: var(--accent);">INTEL FEED</h2>';
-            data.global_news.forEach(n => {
-                const el = document.createElement('div');
-                el.className = 'news-item';
-                el.innerHTML = `<span>${n.source}</span> ${n.event}`;
-                newsFeed.appendChild(el);
-            });
+            // Update Metrics
+            document.getElementById('bias-val').innerText = data.metrics.bias_score + '%';
+            document.getElementById('fairness-val').innerText = data.metrics.fairness_level + '%';
+            document.getElementById('privacy-val').innerText = data.metrics.privacy_integrity + '%';
 
-            // 3. Update Shipments & Map
-            shipmentList.innerHTML = '<h2 style="margin: 0 0 15px 0; font-size: 1rem; color: var(--accent);">ACTIVE MONITOR</h2>';
-            mapLayers.innerHTML = '';
+            // Update Status
+            const statusEl = document.getElementById('status-text');
+            statusEl.innerText = 'STATUS: ' + data.risk_status;
+            statusEl.style.color = gauge.style.borderTopColor;
+            statusEl.style.borderColor = gauge.style.borderTopColor;
 
-            data.active_shipments.forEach(s => {
-                // List Card
+            // Update Violations
+            const log = document.getElementById('violation-log');
+            log.innerHTML = '';
+            data.violations.forEach(v => {
                 const card = document.createElement('div');
-                card.className = 'shipment-card';
+                card.className = 'violation-card';
+                if (v.severity === 'Critical') card.style.borderLeftColor = '#ff4545';
+                else if (v.severity === 'High') card.style.borderLeftColor = '#ffaa00';
+                else card.style.borderLeftColor = '#50ffaf';
+
                 card.innerHTML = `
-                    <div class="id">${s.id}</div>
-                    <div class="route">${s.origin.city} → ${s.destination.city}</div>
-                    <span class="risk ${s.risk_factor}">${s.risk_factor}</span>
-                `;
-                card.onclick = () => showReroute(s);
-                shipmentList.appendChild(card);
-
-                // Map Elements
-                // Line
-                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                line.setAttribute("x1", s.origin.x);
-                line.setAttribute("y1", s.origin.y);
-                line.setAttribute("x2", s.destination.x);
-                line.setAttribute("y2", s.destination.y);
-                line.setAttribute("class", "shipment-line");
-                mapLayers.appendChild(line);
-
-                // Origin Node
-                const origin = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                origin.setAttribute("cx", s.origin.x);
-                origin.setAttribute("cy", s.origin.y);
-                origin.setAttribute("class", "node");
-                mapLayers.appendChild(origin);
-
-                // Dest Node
-                const dest = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                dest.setAttribute("cx", s.destination.x);
-                dest.setAttribute("cy", s.destination.y);
-                dest.setAttribute("class", "node-dest");
-                mapLayers.appendChild(dest);
-            });
-        }
-
-        function showReroute(shipment) {
-            rerouteAnalytics.innerHTML = `
-                <div style="color: var(--accent); margin-bottom: 5px; font-weight: bold;">ID: ${shipment.id}</div>
-                <div style="margin-bottom: 10px;"><strong>Anomaly predicted:</strong> ${shipment.predicted_anomaly}</div>
-                <div style="background: rgba(0,255,170,0.1); padding: 10px; border-radius: 4px; border-left: 3px solid var(--success);">
-                    <strong>Autonomous reroute initiated:</strong> ${shipment.reroute_recommendation}<br>
-                    <span style="color: var(--success); font-weight: bold;">Efficiency gain: ${shipment.savings}</span>
-                </div>
+                <div class="violation-type">${v.type} (${v.severity})</div>
+                <div style="font-size: 0.7rem; color: #888;">Comp: ${v.component}</div>
+                <div class="violation-desc">${v.description}</div>
+                <div class="mitigation"><strong>Mitigation:</strong> ${v.mitigation}</div>
             `;
+                log.appendChild(card);
+            });
+
+            // Update Visual via Pollinations
+            const visualImg = document.getElementById('audit-img');
+            const visualPrompt = encodeURIComponent(data.visual_prompt || "AI Ethics Monitor Shield");
+            visualImg.src = `https://image.pollinations.ai/prompt/${visualPrompt}?width=1000&height=600&model=flux&nologo=true`;
+            visualImg.style.display = 'block';
+            visualImg.previousElementSibling.style.display = 'none'; // hide placeholder text
         }
 
-        btn.addEventListener('click', syncIntel);
-        // Initial sync
-        window.onload = () => { if (input.value) syncIntel(); };
+        btn.addEventListener('click', performAudit);
     </script>
+
 </body>
 
 </html>

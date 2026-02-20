@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
     const { target } = req.body;
     if (!target) {
-        return res.status(400).json({ error: 'Target sector is required' });
+        return res.status(400).json({ error: 'Target AI System is required' });
     }
 
     const API_KEY = process.env.GEMINI_KEY;
@@ -15,31 +15,30 @@ export default async function handler(req, res) {
 
     const MODELS_TO_TRY = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
 
-    const promptText = `Act as a Global Logistics AI Command Center. Analyze the sector: "${target}".
-    Provide a hyper-detailed JSON report for an "Anomaly Predictor" dashboard.
+    const promptText = `Act as an AI Ethics & Security Guard. Audit the system: "${target}".
+    Detect ethical violations including Bias Drift, Fairness Degradation, and Privacy Leakage.
+    Provide a hyper-detailed JSON report for a "Real-Time Ethical Risk Monitor" dashboard.
     The response must be a single JSON object with:
     {
-        "status_summary": "One sentence situational overview",
-        "global_news": [
-            {"event": "Breaking news headline", "impact": "0-100", "source": "Reuters/AI Logistics"}
-        ],
-        "active_shipments": [
+        "overall_integrity": "0-100",
+        "risk_status": "Healthy/Degraded/Critical",
+        "violations": [
             {
-                "id": "SH-XXXX",
-                "origin": {"city": "Name", "x": 0-800, "y": 0-400},
-                "destination": {"city": "Name", "x": 0-800, "y": 0-400},
-                "status": "Delayed/In Transit/Rerouted",
-                "risk_factor": "High/Critical/Stable",
-                "original_eta": "YYYY-MM-DD",
-                "predicted_anomaly": "Description of potential failure",
-                "reroute_recommendation": "Description of the new path",
-                "savings": "Estimated % efficiency gain"
+                "type": "Bias Drift/Privacy Leakage/Fairness Degradation",
+                "severity": "Critical/High/Medium/Low",
+                "component": "Dataset/Model Weights/API Endpoint",
+                "description": "Specific detection detail",
+                "mitigation": "Recommended corrective action"
             }
         ],
-        "system_visual": "Cyberpunk terminal style prompt for a futuristic shipyard map"
+        "metrics": {
+            "bias_score": "0-100",
+            "fairness_level": "0-100",
+            "privacy_integrity": "0-100"
+        },
+        "visual_prompt": "Futuristic clean digital dashboard monitoring neural networks, ethical shield icon, neon blue and orange"
     }
-    Use realistic x/y coordinates for a map area of 800x400. Generate 5 news items and 4 shipments.
-    Return ONLY JSON.`;
+    Generate 5 significant violations. Return ONLY JSON.`;
 
     for (const model of MODELS_TO_TRY) {
         try {
@@ -57,5 +56,5 @@ export default async function handler(req, res) {
             return res.status(200).json(JSON.parse(text));
         } catch (e) { console.error(e); }
     }
-    res.status(500).json({ error: "Intelligence Feed Unavailable" });
+    res.status(500).json({ error: "Ethical Audit Interface Offline" });
 }

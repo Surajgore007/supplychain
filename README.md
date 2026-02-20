@@ -1,25 +1,24 @@
-# Web App Supply Chain Anomaly Predictor
+# AI Ethical Risk Monitor
 
-An AI-powered dashboard for predicting logistics anomalies and simulating global shipment risks using the Gemini API.
+Real-time monitoring for enterprise AI systems to detect bias drift, fairness degradation, and privacy leakage.
 
 ## 🚀 Deployment
 
-This project is built for **Vercel**.
+Designed for seamless deployment on **Vercel**.
 
-1.  **Environment Variable**:
-    - Add `GEMINI_KEY` to your Vercel project settings with your Google Gemini API Key.
-2.  **Push and Deploy**:
-    - The `api/generate.js` file handles secure AI requests server-side.
-    - `index.html` serves as the frontend dashboard.
+1.  **Vercel Dashboard**:
+    - Add `GEMINI_KEY` to Environment Variables.
+2.  **Git Integration**:
+    - Connect your GitHub repository to Vercel for automatic deployment.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Vanilla JavaScript, HTML5, CSS3.
-- **Backend**: Vercel Serverless Functions (Node.js).
-- **AI**: Gemini 1.5 Flash (Analysis), Pollinations Flux (Visual Simulations).
+- **Backend**: Node.js (Vercel Serverless) with Google Gemini AI.
+- **Frontend**: Vanilla JavaScript + CSS Glassmorphism.
+- **AI Models**: Prioritizes `gemini-2.5-flash` for ethical analysis; Pollinations Flux for visuals.
 
-## 📊 Features
+## 🛡️ Monitoring Capabilities
 
-- Regional risk assessment summaries.
-- Real-time simulated anomaly tracking.
-- AI-generated visual simulations of supply chain status.
+- **Bias Drift Tracking**: Monitors for unexpected shifts in model decision patterns.
+- **Fairness Degradation**: Alerts on declining performance across demographic subgroups.
+- **Privacy Guardian**: Detects potential leakage of PII or sensitive training data in model outputs.
