@@ -4,19 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guardian AI | Ethical Risk Monitor</title>
+    <title>Guardian AI | Real-Time Ethical Monitor</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Syncopate:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg: #050508;
-            --panel: rgba(10, 10, 15, 0.9);
+            --bg: #030305;
+            --panel: rgba(8, 8, 12, 0.95);
             --accent: #50ffaf;
             --warning: #ffaa00;
             --danger: #ff4545;
             --text: #f0f0f5;
-            --glass: rgba(255, 255, 255, 0.03);
+            --glass: rgba(255, 255, 255, 0.05);
+            --grid: rgba(80, 255, 175, 0.1);
         }
 
         body {
@@ -24,18 +25,20 @@
             color: var(--text);
             font-family: 'Space Grotesk', sans-serif;
             margin: 0;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 0% 0%, rgba(80, 255, 175, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(255, 69, 69, 0.03) 0%, transparent 50%);
+            overflow: hidden;
+            background-image:
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
         .layout {
             display: grid;
-            grid-template-columns: 380px 1fr;
-            grid-template-rows: 90px 1fr;
+            grid-template-columns: 400px 1fr 350px;
+            grid-template-rows: 80px 1fr;
             height: 100vh;
-            gap: 20px;
-            padding: 20px;
+            gap: 15px;
+            padding: 15px;
             box-sizing: border-box;
         }
 
@@ -43,9 +46,10 @@
             background: var(--panel);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 25px;
+            border-radius: 12px;
+            padding: 20px;
             position: relative;
+            overflow: hidden;
         }
 
         header {
@@ -57,7 +61,7 @@
 
         h1 {
             font-family: 'Syncopate', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1rem;
             letter-spacing: 4px;
             margin: 0;
             color: var(--accent);
@@ -66,18 +70,15 @@
 
         .input-area {
             display: flex;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 6px;
-            border-radius: 12px;
+            gap: 10px;
         }
 
         input {
-            background: transparent;
-            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
-            padding: 10px 15px;
-            width: 300px;
+            padding: 8px 15px;
+            border-radius: 6px;
             outline: none;
             font-family: inherit;
         }
@@ -86,182 +87,199 @@
             background: var(--accent);
             color: black;
             border: none;
-            padding: 10px 25px;
-            border-radius: 8px;
+            padding: 8px 20px;
+            border-radius: 6px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
-        button:hover {
-            box-shadow: 0 0 30px var(--accent);
-            transform: translateY(-2px);
+        /* Live Stream */
+        #log-stream {
+            flex: 1;
+            overflow-y: hidden;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #888;
         }
 
-        /* Integrity Gauge */
-        .integrity-box {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .gauge-circle {
-            width: 150px;
-            height: 150px;
-            border: 8px solid var(--glass);
-            border-radius: 50%;
-            margin: 0 auto 15px;
+        .log-line {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            border-top-color: var(--accent);
-            transition: 1s;
+            justify-content: space-between;
+            animation: fadeIn 0.3s ease-out;
         }
 
-        .gauge-value {
-            font-size: 2.5rem;
-            font-weight: 700;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+        }
+
+        .status-pass {
             color: var(--accent);
+            font-weight: bold;
         }
 
-        /* Metrics Grid */
-        .metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 30px;
+        .status-fail {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        /* Metrics */
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
         }
 
         .metric-card {
             background: var(--glass);
-            padding: 12px;
-            border-radius: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            width: 30%;
             text-align: center;
         }
 
         .metric-card label {
             display: block;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: #888;
+            font-size: 0.6rem;
+            color: #777;
             margin-bottom: 5px;
+            text-transform: uppercase;
         }
 
         .metric-card span {
-            font-weight: 700;
-            color: var(--text);
+            font-weight: bold;
+            color: var(--accent);
+            font-size: 1.1rem;
         }
 
-        /* Violation Log */
-        .violation-log {
+        /* Chart */
+        .chart-box {
+            height: 120px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .bar {
             flex: 1;
-            overflow-y: auto;
+            background: var(--accent);
+            opacity: 0.3;
+            transition: 0.5s;
+            position: relative;
         }
 
-        .violation-card {
-            background: var(--glass);
-            border-left: 3px solid var(--danger);
-            padding: 15px;
+        .bar:hover {
+            opacity: 1;
+        }
+
+        .bar::after {
+            content: attr(data-val);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            translate: -50%;
+            font-size: 0.6rem;
+        }
+
+        /* Alerts */
+        .alert-card {
+            background: rgba(255, 69, 69, 0.1);
+            border: 1px solid var(--danger);
+            padding: 10px;
             border-radius: 8px;
-            margin-bottom: 15px;
-            animation: slideIn 0.4s ease-out;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-        }
-
-        .violation-type {
+        .alert-card strong {
+            display: block;
             color: var(--danger);
-            font-weight: 700;
-            font-size: 0.85rem;
+            margin-bottom: 3px;
+            font-size: 0.7rem;
             text-transform: uppercase;
         }
 
-        .violation-desc {
-            font-size: 0.9rem;
-            margin: 8px 0;
-            color: #ccc;
-        }
-
-        .mitigation {
-            font-size: 0.8rem;
-            color: var(--accent);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 8px;
-            margin-top: 8px;
-        }
-
-        /* Main Viewport */
+        /* Main Center */
         .main-stage {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
-        #visual-anchor {
+        #visual-viewport {
             flex: 1;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
-            justify-content: center;
             align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #visual-anchor img {
-            max-width: 100%;
+            justify-content: center;
+            background: radial-gradient(circle, #111 0%, #000 100%);
             border-radius: 12px;
-            opacity: 0.8;
         }
 
-        .status-overlay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            border: 1px solid var(--accent);
-            color: var(--accent);
+        #visual-viewport img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+            filter: hue-rotate(90deg) contrast(1.2);
         }
 
-        /* Loader */
-        #loader {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            flex-direction: column;
-            justify-content: center;
+        .subgroup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .subgroup-item {
+            background: var(--glass);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+        }
+
+        .subgroup-item div {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Pulsing Status */
+        .status-pulse {
+            display: flex;
             align-items: center;
-            font-family: 'Syncopate', sans-serif;
-            color: var(--accent);
+            gap: 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 1px;
         }
 
-        .scanner {
-            width: 300px;
-            height: 2px;
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
             background: var(--accent);
-            box-shadow: 0 0 20px var(--accent);
-            animation: scanning 1.5s infinite ease-in-out;
+            box-shadow: 0 0 10px var(--accent);
+            animation: pulse 2s infinite;
         }
 
-        @keyframes scanning {
+        @keyframes pulse {
             0% {
-                opacity: 0.2;
+                opacity: 0.4;
             }
 
             50% {
@@ -269,7 +287,7 @@
             }
 
             100% {
-                opacity: 0.2;
+                opacity: 0.4;
             }
         }
     </style>
@@ -277,64 +295,83 @@
 
 <body>
 
-    <div id="loader">
-        <div style="margin-bottom: 20px; letter-spacing: 5px;">SCANNING ETHICAL LAYER</div>
-        <div class="scanner"></div>
-    </div>
-
     <div class="layout">
         <header class="panel">
-            <h1>REAL-TIME ETHICAL RISK MONITOR</h1>
+            <h1>AI ETHICAL RISK MONITOR</h1>
             <div class="input-area">
-                <input type="text" id="target-input" placeholder="SYSTEM ID (e.g. Recruitment AI Core)"
-                    value="Neural-Recruiter v2.4">
-                <button id="audit-btn">INITIATE AUDIT</button>
+                <input type="text" id="target-input" placeholder="System ID..." value="Enterprise-Lending-AI">
+                <button id="start-btn">INITIATE MONITOR</button>
+            </div>
+            <div class="status-pulse">
+                <div class="pulse-dot"></div>
+                LIVE MONITORING IDLE
             </div>
         </header>
 
         <aside class="panel" style="display: flex; flex-direction: column;">
-            <div class="integrity-box">
-                <div class="gauge-circle" id="main-gauge">
-                    <div class="gauge-value" id="integrity-value">--</div>
-                </div>
-                <div style="font-size: 0.8rem; color: #888; text-transform: uppercase;">Overall System Integrity</div>
+            <h2 style="font-size: 0.8rem; color: #555; text-transform: uppercase; margin: 0 0 15px 0;">Live Audit Stream
+            </h2>
+            <div id="log-stream">
+                <div style="padding: 20px; text-align: center; color: #333;">Link standby...</div>
             </div>
-
-            <div class="metrics">
-                <div class="metric-card"><label>Bias</label><span id="bias-val">--</span></div>
-                <div class="metric-card"><label>Fairness</label><span id="fairness-val">--</span></div>
-                <div class="metric-card"><label>Privacy</label><span id="privacy-val">--</span></div>
-            </div>
-
-            <div class="violation-log" id="violation-log">
-                <div style="text-align: center; color: #555; margin-top: 50px;">Waiting for audit link...</div>
+            <div
+                style="margin-top: 20px; font-size: 0.7rem; color: #444; text-transform: uppercase; letter-spacing: 1px;">
+                Auditing 14.5k parameters/sec
             </div>
         </aside>
 
         <main class="main-stage">
-            <div id="visual-anchor">
-                <div class="status-overlay" id="status-text">INITIAL STAGING</div>
-                <img id="audit-img" src="" style="display: none;">
-                <div style="color: #444; font-size: 1.2rem; font-weight: 300;">INTEGRITY MONITOR STANDBY</div>
+            <div id="visual-viewport" class="panel">
+                <img id="main-visual" src="" style="display: none;">
+                <div style="color: #222; font-size: 1.5rem; font-weight: 700;">COMMAND CENTER OFFLINE</div>
             </div>
-
-            <div class="panel" style="flex: 0.2;">
-                <div id="summary-text" style="color: #bbb; line-height: 1.6;">Enter enterprise AI system parameters to
-                    begin real-time ethical drift analysis.</div>
+            <div class="panel" style="flex: 0.3;">
+                <h2 style="font-size: 0.8rem; color: #555; text-transform: uppercase; margin: 0 0 15px 0;">Bias Drift
+                    Trend (Beta)</h2>
+                <div class="chart-box" id="drift-chart">
+                    <div class="bar" style="height: 0%"></div>
+                    <div class="bar" style="height: 0%"></div>
+                    <div class="bar" style="height: 0%"></div>
+                    <div class="bar" style="height: 0%"></div>
+                    <div class="bar" style="height: 0%"></div>
+                </div>
             </div>
         </main>
+
+        <aside class="panel" style="display: flex; flex-direction: column;">
+            <h2 style="font-size: 0.8rem; color: #555; text-transform: uppercase; margin: 0 0 15px 0;">Ethics Integrity
+            </h2>
+            <div class="metric-row">
+                <div class="metric-card"><label>Global</label><span id="integrity-val">--</span></div>
+                <div class="metric-card"><label>Fairness</label><span id="fairness-avg">--</span></div>
+                <div class="metric-card"><label>Safety</label><span id="safety-val">--</span></div>
+            </div>
+
+            <h2 style="font-size: 0.8rem; color: #555; text-transform: uppercase; margin: 20px 0 10px 0;">Critical
+                Alerts</h2>
+            <div id="alert-stack"></div>
+
+            <h2 style="font-size: 0.8rem; color: #555; text-transform: uppercase; margin: 20px 0 10px 0;">Subgroup
+                Parity</h2>
+            <div class="subgroup-grid" id="subgroup-grid"></div>
+        </aside>
     </div>
 
     <script>
-        const btn = document.getElementById('audit-btn');
+        const startBtn = document.getElementById('start-btn');
         const input = document.getElementById('target-input');
-        const loader = document.getElementById('loader');
+        const logStream = document.getElementById('log-stream');
+        const statusText = document.querySelector('.status-pulse');
 
-        async function performAudit() {
+        let streamInterval;
+
+        async function startMonitor() {
             const target = input.value.trim();
             if (!target) return;
 
-            loader.style.display = 'flex';
+            clearInterval(streamInterval);
+            logStream.innerHTML = '';
+            statusText.innerHTML = '<div class="pulse-dot"></div> ESTABLISHING NEURAL LINK...';
 
             try {
                 const response = await fetch('/api/generate', {
@@ -343,64 +380,79 @@
                     body: JSON.stringify({ target })
                 });
 
-                if (!response.ok) throw new Error("Audit Link Severed");
+                if (!response.ok) throw new Error("Link Failed");
                 const data = await response.json();
 
-                updateDashboard(data);
+                initiateDashboard(data);
             } catch (err) {
                 alert(err.message);
-            } finally {
-                loader.style.display = 'none';
             }
         }
 
-        function updateDashboard(data) {
-            // Update Gauge
-            document.getElementById('integrity-value').innerText = data.overall_integrity + '%';
-            const gauge = document.getElementById('main-gauge');
-            const intensity = 100 - data.overall_integrity;
-            gauge.style.borderTopColor = data.overall_integrity > 70 ? '#50ffaf' : (data.overall_integrity > 40 ? '#ffaa00' : '#ff4545');
-            gauge.style.boxShadow = `0 0 40px ${gauge.style.borderTopColor}22`;
+        function initiateDashboard(data) {
+            statusText.innerHTML = '<div class="pulse-dot"></div> LIVE MONITORING ACTIVE';
 
-            // Update Metrics
-            document.getElementById('bias-val').innerText = data.metrics.bias_score + '%';
-            document.getElementById('fairness-val').innerText = data.metrics.fairness_level + '%';
-            document.getElementById('privacy-val').innerText = data.metrics.privacy_integrity + '%';
+            // 1. Static Content
+            document.getElementById('integrity-val').innerText = data.baseline_integrity + '%';
+            document.getElementById('safety-val').innerText = (data.baseline_integrity > 80 ? 'HIGH' : 'LOW');
 
-            // Update Status
-            const statusEl = document.getElementById('status-text');
-            statusEl.innerText = 'STATUS: ' + data.risk_status;
-            statusEl.style.color = gauge.style.borderTopColor;
-            statusEl.style.borderColor = gauge.style.borderTopColor;
+            // Alerts
+            const stack = document.getElementById('alert-stack');
+            stack.innerHTML = data.risk_alerts.map(a => `
+            <div class="alert-card">
+                <strong>[!] ${a.type} (${a.impact})</strong>
+                ${a.desc}
+            </div>
+        `).join('');
 
-            // Update Violations
-            const log = document.getElementById('violation-log');
-            log.innerHTML = '';
-            data.violations.forEach(v => {
-                const card = document.createElement('div');
-                card.className = 'violation-card';
-                if (v.severity === 'Critical') card.style.borderLeftColor = '#ff4545';
-                else if (v.severity === 'High') card.style.borderLeftColor = '#ffaa00';
-                else card.style.borderLeftColor = '#50ffaf';
+            // Subgroups
+            const grid = document.getElementById('subgroup-grid');
+            grid.innerHTML = data.drilldown.fairness_subgroups.map(s => `
+            <div class="subgroup-item">
+                <span style="color: #666">${s.group}</span>
+                <div>
+                    <strong>${s.score}%</strong>
+                    <span class="indicator" style="background: ${s.status === 'Stable' ? 'var(--accent)' : 'var(--danger)'}"></span>
+                </div>
+            </div>
+        `).join('');
 
-                card.innerHTML = `
-                <div class="violation-type">${v.type} (${v.severity})</div>
-                <div style="font-size: 0.7rem; color: #888;">Comp: ${v.component}</div>
-                <div class="violation-desc">${v.description}</div>
-                <div class="mitigation"><strong>Mitigation:</strong> ${v.mitigation}</div>
-            `;
-                log.appendChild(card);
+            // Drift Chart
+            const bars = document.querySelectorAll('.bar');
+            data.drilldown.bias_drift_trend.forEach((val, i) => {
+                bars[i].style.height = val + '%';
+                bars[i].setAttribute('data-val', val + '%');
             });
 
-            // Update Visual via Pollinations
-            const visualImg = document.getElementById('audit-img');
-            const visualPrompt = encodeURIComponent(data.visual_prompt || "AI Ethics Monitor Shield");
-            visualImg.src = `https://image.pollinations.ai/prompt/${visualPrompt}?width=1000&height=600&model=flux&nologo=true`;
-            visualImg.style.display = 'block';
-            visualImg.previousElementSibling.style.display = 'none'; // hide placeholder text
+            // 2. Visual Simulation
+            const viewport = document.getElementById('visual-viewport');
+            const img = document.getElementById('main-visual');
+            img.src = `https://image.pollinations.ai/prompt/${encodeURIComponent(data.visual_prompt)}?width=1000&height=600&model=flux&nologo=true`;
+            img.style.display = 'block';
+            viewport.querySelector('div').style.display = 'none';
+
+            // 3. Simulated Stream
+            let packetIdx = 0;
+            streamInterval = setInterval(() => {
+                const p = data.live_stream_packets[packetIdx % data.live_stream_packets.length];
+                const el = document.createElement('div');
+                el.className = 'log-line';
+                el.innerHTML = `
+                <span>[${new Date().toLocaleTimeString()}] ${p.id}</span>
+                <span>${p.module}</span>
+                <span class="status-${p.status.toLowerCase()}">${p.status}</span>
+            `;
+                logStream.prepend(el);
+                if (logStream.children.length > 20) logStream.removeChild(logStream.lastChild);
+                packetIdx++;
+            }, 1500);
+
+            // Compute Fairness Avg
+            const avg = data.drilldown.fairness_subgroups.reduce((acc, s) => acc + s.score, 0) / data.drilldown.fairness_subgroups.length;
+            document.getElementById('fairness-avg').innerText = Math.round(avg) + '%';
         }
 
-        btn.addEventListener('click', performAudit);
+        startBtn.addEventListener('click', startMonitor);
     </script>
 
 </body>
