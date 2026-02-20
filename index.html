@@ -1,67 +1,403 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supply Chain Anomaly Predictor</title>
+    <title>AI Logistics Command | Supply Chain Predictor</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap"
+        rel="stylesheet">
     <style>
-        :root { --bg: #0a0a0c; --text: #e0e0e0; --accent: #00f2ff; --card: #16161a; --border: #333; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 800px; }
-        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
-        h1 { margin: 0; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); font-size: 1.5rem; }
-        .input-box { display: flex; gap: 10px; margin-bottom: 30px; }
-        input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 4px; font-size: 1rem; }
-        button { background: var(--accent); color: black; border: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        #output { display: none; }
-        .summary { background: var(--card); padding: 20px; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 20px; line-height: 1.6; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .anomaly-card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 8px; font-size: 0.9rem; }
-        .severity { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-bottom: 8px; }
-        .Critical { background: #ff4d4d; color: white; }
-        .High { background: #ff944d; color: black; }
-        .Medium { background: #ffdb4d; color: black; }
-        .Low { background: #4dff88; color: black; }
-        img { width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-top: 20px; }
-        .loader { text-align: center; display: none; margin: 20px 0; color: var(--accent); font-weight: bold; }
+        :root {
+            --bg: #020205;
+            --panel: rgba(16, 16, 24, 0.8);
+            --accent: #00f2ff;
+            --danger: #ff0055;
+            --success: #00ffaa;
+            --text: #e0e6ed;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 70%),
+                linear-gradient(rgba(18, 18, 20, 0.8) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(18, 18, 20, 0.8) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            grid-template-rows: 80px 1fr 100px;
+            height: 100vh;
+            gap: 15px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        /* Glassmorphism Panel */
+        .panel {
+            background: var(--panel);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+        }
+
+        header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            margin: 0;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+
+        .search-area {
+            display: flex;
+            gap: 10px;
+            background: var(--glass);
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            width: 250px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        button {
+            background: var(--accent);
+            color: black;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            box-shadow: 0 0 20px var(--accent);
+            transform: translateY(-1px);
+        }
+
+        /* Sidebar - Shipment List */
+        .sidebar-left {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .shipment-card {
+            background: var(--glass);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .shipment-card:hover {
+            border-color: var(--accent);
+            background: rgba(0, 242, 255, 0.05);
+        }
+
+        .shipment-card .id {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .shipment-card .route {
+            font-size: 0.9rem;
+            margin: 5px 0;
+        }
+
+        .shipment-card .risk {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid currentColor;
+        }
+
+        .risk.Critical {
+            color: var(--danger);
+        }
+
+        .risk.High {
+            color: #ffa500;
+        }
+
+        .risk.Stable {
+            color: var(--success);
+        }
+
+        /* Main Section - Map */
+        .main-stage {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #map-container {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 242, 255, 0.1);
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .path {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 1;
+        }
+
+        .shipment-line {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 2;
+            stroke-dasharray: 10, 5;
+            animation: dash 30s linear infinite;
+        }
+
+        .reroute-line {
+            fill: none;
+            stroke: var(--success);
+            stroke-width: 2;
+            opacity: 0.6;
+        }
+
+        .node {
+            fill: var(--accent);
+            r: 4;
+        }
+
+        .node-dest {
+            fill: var(--danger);
+            r: 4;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -1000;
+            }
+        }
+
+        /* Right Sidebar - Intel Feed */
+        .sidebar-right {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .news-item {
+            font-size: 0.85rem;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .news-item span {
+            color: var(--accent);
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        /* Footer - News Ticker */
+        footer {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .ticker {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 60s linear infinite;
+            color: var(--accent);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+
+            100% {
+                transform: translate3d(-100%, 0, 0);
+            }
+        }
+
+        /* Overlay Loader */
+        .terminal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            color: var(--accent);
+        }
+
+        .typing {
+            border-right: 2px solid var(--accent);
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 2s steps(40, end), blink .75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0
+            }
+
+            to {
+                width: 100%
+            }
+        }
+
+        @keyframes blink {
+
+            from,
+            to {
+                border-color: transparent
+            }
+
+            50% {
+                border-color: var(--accent)
+            }
+        }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>Global Supply Chain Predictor</h1>
+
+    <div id="terminal" class="terminal-overlay">
+        <div class="typing">INITIALIZING GLOBAL INTELLIGENCE LINK...</div>
+    </div>
+
+    <div class="dashboard">
+        <header class="panel">
+            <h1>Supply Chain Anomaly Predictor</h1>
+            <div class="search-area">
+                <input type="text" id="target-input" placeholder="SECTOR: (e.g. Semiconductors)" value="Semiconductors">
+                <button id="predict-btn">SYNC INTEL</button>
+            </div>
+            <div id="summary-header" style="font-size: 0.9rem; color: #888;">Standby for network sync...</div>
         </header>
 
-        <div class="input-box">
-            <input type="text" id="target-input" placeholder="Enter sector (e.g. Pharma, Tech, Automotive)..." autocomplete="off">
-            <button id="predict-btn">Predict</button>
-        </div>
+        <section class="sidebar-left panel" id="shipment-list">
+            <h2 style="margin: 0 0 15px 0; font-size: 1rem; color: var(--accent);">ACTIVE MONITOR</h2>
+            <!-- Shipment Cards Load Here -->
+        </section>
 
-        <div id="loader" class="loader">MONITORING LOGISTICS NETWORKS...</div>
+        <section class="main-stage">
+            <div id="map-container" class="panel">
+                <svg id="world-map" viewBox="0 0 800 400">
+                    <!-- Placeholder Map Grid -->
+                    <g opacity="0.1">
+                        <line x1="0" y1="100" x2="800" y2="100" stroke="white" />
+                        <line x1="0" y1="200" x2="800" y2="200" stroke="white" />
+                        <line x1="0" y1="300" x2="800" y2="300" stroke="white" />
+                        <line x1="200" y1="0" x2="200" y2="400" stroke="white" />
+                        <line x1="400" y1="0" x2="400" y2="400" stroke="white" />
+                        <line x1="600" y1="0" x2="600" y2="400" stroke="white" />
+                    </g>
+                    <g id="map-layers"></g>
+                </svg>
+            </div>
+            <div class="panel" style="flex: 0.3;">
+                <h2 style="margin: 0 0 10px 0; font-size: 1rem; color: var(--accent);">REROUTE ANALYTICS</h2>
+                <div id="reroute-details" style="font-size: 0.9rem; color: #aaa;">Select a flagged shipment for deep
+                    analysis.</div>
+            </div>
+        </section>
 
-        <div id="output">
-            <div id="summary" class="summary"></div>
-            <div id="anomaly-grid" class="grid"></div>
-            <img id="visual-sim" alt="AI Visual Simulation">
-        </div>
+        <section class="sidebar-right panel" id="news-feed">
+            <h2 style="margin: 0 0 15px 0; font-size: 1rem; color: var(--accent);">INTEL FEED</h2>
+            <!-- News Items Load Here -->
+        </section>
+
+        <footer id="ticker-footer">
+            <div class="ticker" id="ticker-content">SYSTEM STANDBY // WAITING FOR SECTOR INPUT // INITIALIZING...</div>
+        </footer>
     </div>
 
     <script>
         const btn = document.getElementById('predict-btn');
         const input = document.getElementById('target-input');
-        const output = document.getElementById('output');
-        const loader = document.getElementById('loader');
+        const terminal = document.getElementById('terminal');
+        const mapLayers = document.getElementById('map-layers');
+        const shipmentList = document.getElementById('shipment-list');
+        const newsFeed = document.getElementById('news-feed');
+        const summaryHeader = document.getElementById('summary-header');
+        const ticker = document.getElementById('ticker-content');
+        const rerouteAnalytics = document.getElementById('reroute-details');
 
-        btn.addEventListener('click', async () => {
+        async function syncIntel() {
             const target = input.value.trim();
-            if (!target) return alert("Please enter a target sector.");
+            if (!target) return;
 
-            // Reset
-            btn.disabled = true;
-            btn.textContent = "Analyzing...";
-            loader.style.display = 'block';
-            output.style.display = 'none';
+            terminal.style.display = 'flex';
 
             try {
                 const response = await fetch('/api/generate', {
@@ -70,41 +406,88 @@
                     body: JSON.stringify({ target })
                 });
 
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.error || "Prediction failed.");
-                }
-
+                if (!response.ok) throw new Error("Sync Failed");
                 const data = await response.json();
 
-                // Build Summary
-                document.getElementById('summary').innerHTML = `<strong>Network Insight:</strong> ${data.summary}`;
-
-                // Build Grid
-                const grid = document.getElementById('anomaly-grid');
-                grid.innerHTML = (data.anomalies || []).map(a => `
-                    <div class="anomaly-card">
-                        <span class="severity ${a.severity}">${a.severity}</span>
-                        <div style="font-weight: bold; margin-bottom: 5px; color: var(--accent);">${a.type}</div>
-                        <div style="font-size: 0.8rem; margin-bottom: 8px;">${a.description}</div>
-                        <div style="font-size: 0.7rem; color: #888;">ETA Impact: ${a.date}</div>
-                    </div>
-                `).join('');
-
-                // Visual Simulation via Pollinations
-                const visualPrompt = encodeURIComponent(data.visual_prompt || `Futuristic warehouse logistics for ${target}, cyberpunk style, detailed`);
-                document.getElementById('visual-sim').src = `https://image.pollinations.ai/prompt/${visualPrompt}?width=800&height=400&model=flux`;
-
-                output.style.display = 'block';
-
+                renderDashboard(data);
             } catch (err) {
-                alert("Error: " + err.message);
+                alert(err.message);
             } finally {
-                btn.disabled = false;
-                btn.textContent = "Predict";
-                loader.style.display = 'none';
+                setTimeout(() => { terminal.style.display = 'none'; }, 800);
             }
-        });
+        }
+
+        function renderDashboard(data) {
+            // 1. Update Header & Ticker
+            summaryHeader.innerText = data.status_summary;
+            ticker.innerText = (data.global_news || []).map(n => `[!] ${n.event} (Impact: ${n.impact})`).join(" // ");
+
+            // 2. Update News Feed
+            newsFeed.innerHTML = '<h2 style="margin: 0 0 15px 0; font-size: 1rem; color: var(--accent);">INTEL FEED</h2>';
+            data.global_news.forEach(n => {
+                const el = document.createElement('div');
+                el.className = 'news-item';
+                el.innerHTML = `<span>${n.source}</span> ${n.event}`;
+                newsFeed.appendChild(el);
+            });
+
+            // 3. Update Shipments & Map
+            shipmentList.innerHTML = '<h2 style="margin: 0 0 15px 0; font-size: 1rem; color: var(--accent);">ACTIVE MONITOR</h2>';
+            mapLayers.innerHTML = '';
+
+            data.active_shipments.forEach(s => {
+                // List Card
+                const card = document.createElement('div');
+                card.className = 'shipment-card';
+                card.innerHTML = `
+                    <div class="id">${s.id}</div>
+                    <div class="route">${s.origin.city} → ${s.destination.city}</div>
+                    <span class="risk ${s.risk_factor}">${s.risk_factor}</span>
+                `;
+                card.onclick = () => showReroute(s);
+                shipmentList.appendChild(card);
+
+                // Map Elements
+                // Line
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", s.origin.x);
+                line.setAttribute("y1", s.origin.y);
+                line.setAttribute("x2", s.destination.x);
+                line.setAttribute("y2", s.destination.y);
+                line.setAttribute("class", "shipment-line");
+                mapLayers.appendChild(line);
+
+                // Origin Node
+                const origin = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                origin.setAttribute("cx", s.origin.x);
+                origin.setAttribute("cy", s.origin.y);
+                origin.setAttribute("class", "node");
+                mapLayers.appendChild(origin);
+
+                // Dest Node
+                const dest = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                dest.setAttribute("cx", s.destination.x);
+                dest.setAttribute("cy", s.destination.y);
+                dest.setAttribute("class", "node-dest");
+                mapLayers.appendChild(dest);
+            });
+        }
+
+        function showReroute(shipment) {
+            rerouteAnalytics.innerHTML = `
+                <div style="color: var(--accent); margin-bottom: 5px; font-weight: bold;">ID: ${shipment.id}</div>
+                <div style="margin-bottom: 10px;"><strong>Anomaly predicted:</strong> ${shipment.predicted_anomaly}</div>
+                <div style="background: rgba(0,255,170,0.1); padding: 10px; border-radius: 4px; border-left: 3px solid var(--success);">
+                    <strong>Autonomous reroute initiated:</strong> ${shipment.reroute_recommendation}<br>
+                    <span style="color: var(--success); font-weight: bold;">Efficiency gain: ${shipment.savings}</span>
+                </div>
+            `;
+        }
+
+        btn.addEventListener('click', syncIntel);
+        // Initial sync
+        window.onload = () => { if (input.value) syncIntel(); };
     </script>
 </body>
+
 </html>
